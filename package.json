@@ -1,0 +1,73 @@
+{
+  "name": "k3ux",
+  "version": "0.1.0",
+  "description": "K3ux — Material 3 Expressive UX animations (optional companion to k3ui)",
+  "author": "Kam3leoN",
+  "license": "MIT AND GPL-3.0-only",
+  "type": "module",
+  "main": "./dist/k3ux.js",
+  "module": "./dist/k3ux.js",
+  "types": "./dist/k3ux.d.ts",
+  "style": "./dist/k3ux.css",
+  "exports": {
+    ".": {
+      "types": "./dist/k3ux.d.ts",
+      "import": "./dist/k3ux.js",
+      "default": "./dist/k3ux.js"
+    },
+    "./k3ux.css": "./dist/k3ux.css",
+    "./holo-effects.css": "./dist/holo-effects/k3ux-holo-effects.css"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "dev": "vite --config playground/vite.config.ts",
+    "build": "npm run build:lib && npm run build:holo-effects",
+    "build:lib": "vite build",
+    "build:holo-effects": "node scripts/build-holo-effects.mjs",
+    "build:playground": "vite build --config playground/vite.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "check": "npm run lint && npm test && npm run build",
+    "preview": "vite preview --config playground/vite.config.ts"
+  },
+  "keywords": [
+    "material-design",
+    "material-3",
+    "expressive",
+    "web-components",
+    "lit",
+    "k3ux",
+    "k3ui",
+    "animation"
+  ],
+  "engines": {
+    "node": ">=18.18"
+  },
+  "homepage": "https://github.com/Kam3leoN/k3ux-expressive#readme",
+  "bugs": "https://github.com/Kam3leoN/k3ux-expressive/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kam3leoN/k3ux-expressive.git"
+  },
+  "peerDependencies": {
+    "k3ui": ">=0.1.0",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "jsdom": "^26.0.0",
+    "k3ui": "file:../K3ui",
+    "lit": "^3.2.1",
+    "sass": "^1.85.1",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2",
+    "vite-plugin-dts": "^4.5.3",
+    "vitest": "^3.0.9"
+  }
+}

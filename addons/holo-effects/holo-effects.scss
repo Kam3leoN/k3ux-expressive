@@ -1,0 +1,1008 @@
+/*!
+ * k3ui holo effects — 13 foils for <k3-holo-card>
+ * holo · reverse · cosmos · rainbow · rainbow-alt · secret · v · vmax · vstar ·
+ * full-art · shiny · radiant · full-art-wave
+ *
+ * Adapted from pokemon-cards-css by simeydotme
+ * https://github.com/simeydotme/pokemon-cards-css
+ * This stylesheet and the images in ./img are licensed under the GNU GPL v3
+ * (see LICENSE next to this file). k3ui itself stays MIT: this add-on is a
+ * separate, optional file — load it only if your project accepts the GPL.
+ */
+
+// =============================================================================
+//  Usage (after k3ui):
+//    import 'k3ui/holo-effects.css';            // or <link rel="stylesheet" …>
+//    <k3-holo-card effect="cosmos">…</k3-holo-card>
+//
+//  The foils paint the component from outside through ::part(card|shine|glare),
+//  driven by the --k3-holo-* variables the component writes on its host.
+//
+//  Card layout (defaults fit a standard trading card — override per card):
+//    --k3-holo-art-window   where the illustration is (reverse)
+//    --k3-holo-reverse-clip everything but the illustration (reverse)
+//    --k3-holo-art-clip     none = whole card; var(--k3-holo-art-window) to limit
+//                           holo, cosmos, shiny and radiant to the illustration
+//    --k3-holo-texture      0 … 1 — engraved pattern of vmax / vstar
+// =============================================================================
+
+@use 'sass:list';
+
+// Where the images are served, relative to the compiled stylesheet
+$holo-img-path: './img' !default;
+
+@function holo-img($file) {
+  @return url('#{$holo-img-path}/#{$file}');
+}
+
+// ---- Palettes -----------------------------------------------------------------
+$holo-violet: #c929f1 !default;
+$holo-blue: #0dbde9 !default;
+$holo-green: #21e985 !default;
+$holo-yellow: #eedf10 !default;
+$holo-red: #f80e35 !default;
+
+$holo-gold-dark: hsl(46, 95%, 50%) !default;
+$holo-gold-light: hsl(52, 100%, 69%) !default;
+
+// ---- Per-card settings --------------------------------------------------------
+// Defaults fit a standard trading card; override them per card
+// with style="--k3-holo-art-window: …" when the layout differs.
+:where(k3-holo-card) {
+  // Engraved pattern of vmax / vstar (0 = exactly like pokemon-cards-css)
+  --k3-holo-texture: 1;
+
+  // Where the illustration is (taller artwork: inset(14.5% 8.5% 48.2% 8.5%))
+  --k3-holo-art-window: inset(9.85% 8% 52.85% 8%);
+  // Everything but the illustration: where reverse shines
+  --k3-holo-reverse-clip: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 47.15%, 92% 47.15%, 92% 9.85%, 8% 9.85%, 8% 47.15%, 0% 47.15%);
+  // Clip of holo, cosmos, shiny and radiant: `none` = the whole card.
+  // Limit them to the illustration, like printed cards: var(--k3-holo-art-window)
+  --k3-holo-art-clip: none;
+}
+
+// As in pokemon-cards-css, the foil is painted above the glare
+k3-holo-card:not([effect='prism']):not([effect='none'])::part(shine) {
+  z-index: 1;
+}
+
+// Vertical light bars, repeated every `$period`
+@function holo-light-bars($period) {
+  @return repeating-linear-gradient(
+    90deg,
+    #000 6%,
+    hsl(0, 0%, 70%) 9%,
+    #000 10.5%,
+    hsl(0, 0%, 70%) 12%,
+    #000 15%,
+    #000 $period
+  );
+}
+
+// =============================================================================
+//  HOLO: scanned rainbow + crossing light bars
+// =============================================================================
+k3-holo-card[effect='holo'] {
+  --k3-holo-scanline: 1px;
+
+  // Finer scanlines on small screens
+  @media (max-width: 900px) {
+    --k3-holo-scanline: 0.5px;
+  }
+
+  &::part(shine) {
+    clip-path: var(--k3-holo-art-clip);
+    background-image:
+      repeating-linear-gradient(
+        110deg,
+        $holo-violet, $holo-blue, $holo-green, $holo-yellow, $holo-red,
+        $holo-violet, $holo-blue, $holo-green, $holo-yellow, $holo-red,
+        $holo-violet, $holo-blue, $holo-green, $holo-yellow, $holo-red
+      ),
+      // fine vertical scanlines of the foil
+      repeating-linear-gradient(
+        90deg,
+        #000 0 calc(var(--k3-holo-scanline) * 2),
+        #666 calc(var(--k3-holo-scanline) * 2) calc(var(--k3-holo-scanline) * 4)
+      );
+    background-size: 400% 400%, cover;
+    // The rainbow runs against the pointer, faster vertically
+    background-position:
+      calc(50% + (50% - var(--k3-holo-background-x)) * 2.6) calc(50% + (50% - var(--k3-holo-background-y)) * 3.5),
+      center;
+    background-blend-mode: overlay;
+    filter: brightness(1.1) contrast(1.1) saturate(1.2);
+    mix-blend-mode: color-dodge;
+
+    // Two sets of bars sliding in opposite directions
+    &::before {
+      content: '';
+      background-image: holo-light-bars(42%), holo-light-bars(30%);
+      background-size: 200% 200%;
+      background-position:
+        calc(50% + (50% - var(--k3-holo-background-x)) * 1.65 + var(--k3-holo-background-y) * 0.5) center,
+        calc(50% - (50% - var(--k3-holo-background-x)) * 0.9 - var(--k3-holo-background-y) * 0.75) center;
+      background-blend-mode: screen;
+      filter: brightness(1.15) contrast(1.1);
+      mix-blend-mode: hard-light;
+    }
+
+    // Spotlight: only the area around the pointer lights up
+    &::after {
+      content: '';
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsla(0, 0%, 90%, 0.8) 0%,
+        hsla(0, 0%, 78%, 0.1) 25%,
+        #000 90%
+      );
+      filter: brightness(0.6) contrast(4);
+      mix-blend-mode: luminosity;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * var(--k3-holo-card-intensity, 1) * 0.8);
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(0, 0%, 100%, 0.8) 10%,
+      hsla(0, 0%, 100%, 0.65) 20%,
+      hsla(0, 0%, 0%, 0.5) 90%
+    );
+    filter: brightness(0.8) contrast(1.5);
+    mix-blend-mode: overlay;
+
+    // Stronger bluish glare over the foil
+    &::after {
+      content: '';
+      clip-path: var(--k3-holo-art-clip);
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsl(180, 100%, 95%) 5%,
+        hsla(0, 0%, 39%, 0.25) 55%,
+        hsla(0, 0%, 0%, 0.36) 110%
+      );
+      filter: brightness(0.6) contrast(3);
+      mix-blend-mode: overlay;
+    }
+  }
+}
+
+// =============================================================================
+//  COSMOS: three galaxy layers + rainbow in parallax
+// =============================================================================
+$holo-cosmos-rainbow: repeating-linear-gradient(
+  82deg,
+  hsl(53, 65%, 60%) 4%,
+  hsl(93, 56%, 50%) 8%,
+  hsl(176, 54%, 49%) 12%,
+  hsl(228, 59%, 55%) 16%,
+  hsl(283, 60%, 55%) 20%,
+  hsl(326, 59%, 51%) 24%,
+  hsl(326, 59%, 51%) 28%,
+  hsl(283, 60%, 55%) 32%,
+  hsl(228, 59%, 55%) 36%,
+  hsl(176, 54%, 49%) 40%,
+  hsl(93, 56%, 50%) 44%,
+  hsl(53, 65%, 60%) 48%
+);
+
+k3-holo-card[effect='cosmos'] {
+  // Per-card galaxy offset (seed written by the component)
+  --k3-holo-cosmos-offset: calc(var(--k3-holo-seed-x) * 734px) calc(var(--k3-holo-seed-y) * 1024px);
+
+  &::part(shine) {
+    clip-path: var(--k3-holo-art-clip);
+    background-image:
+      holo-img('cosmos-bottom.png'),
+      $holo-cosmos-rainbow,
+      radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsla(180, 100%, 89%, 0.5) 5%,
+        hsla(180, 14%, 57%, 0.3) 40%,
+        #000 130%
+      );
+    background-size: cover, 400% 900%, cover;
+    background-position:
+      var(--k3-holo-cosmos-offset),
+      calc(10% + var(--k3-holo-pointer-from-left) * 80%) calc(10% + var(--k3-holo-pointer-from-top) * 80%),
+      center;
+    background-blend-mode: color-burn, multiply;
+    filter: saturate(0.8);
+    mix-blend-mode: color-dodge;
+
+    // Middle layer: the rainbow moves a little slower (parallax)
+    &::before {
+      content: '';
+      background-image: holo-img('cosmos-middle-trans.png'), $holo-cosmos-rainbow;
+      background-size: cover, 400% 900%;
+      background-position:
+        var(--k3-holo-cosmos-offset),
+        calc(15% + var(--k3-holo-pointer-from-left) * 70%) calc(15% + var(--k3-holo-pointer-from-top) * 70%);
+      background-blend-mode: lighten;
+      filter: brightness(1.25) contrast(1.75) saturate(0.8);
+      mix-blend-mode: overlay;
+    }
+
+    // Top layer: slower still
+    &::after {
+      content: '';
+      background-image: holo-img('cosmos-top-trans.png'), $holo-cosmos-rainbow;
+      background-size: cover, 400% 900%;
+      background-position:
+        var(--k3-holo-cosmos-offset),
+        calc(20% + var(--k3-holo-pointer-from-left) * 60%) calc(20% + var(--k3-holo-pointer-from-top) * 60%);
+      background-blend-mode: multiply;
+      filter: brightness(1.25) contrast(1.75) saturate(0.8);
+      mix-blend-mode: multiply;
+    }
+  }
+
+  &::part(glare) {
+    // The glare grows toward the edges
+    opacity: calc(var(--k3-holo-opacity) * var(--k3-holo-card-intensity, 1) * (0.25 + var(--k3-holo-pointer-from-center)));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(204, 100%, 95%, 0.8) 5%,
+      hsl(250, 15%, 20%) 150%
+    );
+    filter: brightness(0.75) contrast(2) saturate(2);
+    mix-blend-mode: overlay;
+
+    &::after {
+      content: '';
+      clip-path: var(--k3-holo-art-clip);
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsl(280, 100%, 96%) 5%,
+        hsl(0, 0%, 10%) 60%
+      );
+      filter: brightness(0.75) contrast(2.5) saturate(2);
+      mix-blend-mode: soft-light;
+      opacity: calc(1 - var(--k3-holo-pointer-from-top) * 0.75);
+    }
+  }
+}
+
+// =============================================================================
+//  SECRET: glittering gold leaf over the whole card
+// =============================================================================
+k3-holo-card[effect='secret'] {
+  &::part(shine) {
+    background-image:
+      holo-img('glitter.png'),
+      holo-img('glitter.png'),
+      conic-gradient(
+        hsl(176, 100%, 76%),
+        hsl(228, 100%, 74%),
+        hsl(283, 100%, 73%),
+        hsl(2, 100%, 73%),
+        hsl(176, 100%, 76%)
+      ),
+      radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsla(0, 0%, 0%, 0.98) 10%,
+        hsla(0, 0%, 95%, 0.15) 90%
+      );
+    background-size: 25% 25%, 25% 25%, cover, cover;
+    background-position: 45% 45%, 55% 55%, center, center;
+    background-blend-mode: soft-light, hard-light, overlay;
+    // Brighter away from the centre
+    filter: brightness(calc(0.2 + var(--k3-holo-pointer-from-center) * 0.3)) contrast(2) saturate(0.75);
+    mix-blend-mode: color-dodge;
+
+    // Gold-tinted geometric pattern
+    &::before {
+      content: '';
+      background-image:
+        holo-img('geometric.png'),
+        linear-gradient(45deg, $holo-gold-dark, $holo-gold-light),
+        radial-gradient(
+          farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+          hsla(10, 20%, 90%, 0.95) 10%,
+          #000 70%
+        );
+      background-size: 33%, cover, cover;
+      background-position: center;
+      background-blend-mode: hard-light, multiply;
+      filter: brightness(1.25) contrast(1.25) saturate(0.35);
+      mix-blend-mode: lighten;
+      opacity: 0.8;
+    }
+
+    // Glitter twinkling, slightly following the pointer
+    &::after {
+      content: '';
+      background-image: holo-img('glitter.png');
+      background-size: 25% 25%;
+      background-position:
+        calc(50% + 1px - 2px * var(--k3-holo-pointer-from-left))
+        calc(50% + 1px - 2px * var(--k3-holo-pointer-from-top));
+      filter: brightness(calc(0.6 + var(--k3-holo-pointer-from-center) * 0.6)) contrast(1.5);
+      mix-blend-mode: overlay;
+    }
+  }
+
+  &::part(glare) {
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(45, 8%, 80%, 0.3) 0%,
+      hsl(22, 15%, 12%) 180%
+    );
+    filter: brightness(1.3) contrast(1.5);
+    mix-blend-mode: hard-light;
+  }
+}
+
+// =============================================================================
+//  Helpers shared by the following foils
+// =============================================================================
+
+// Pastel rainbow of the V family
+$holo-sunpillar: (
+  hsl(2, 100%, 73%),
+  hsl(53, 100%, 69%),
+  hsl(93, 100%, 69%),
+  hsl(176, 100%, 76%),
+  hsl(228, 100%, 74%),
+  hsl(283, 100%, 73%)
+) !default;
+
+// Horizontal rainbow bands, repeated every 7 × $space.
+// $shift rotates the colours: 0 for the main layer, 5 for ::after.
+@function holo-sunpillar-bands($shift: 0, $space: 5%) {
+  $stops: ();
+  @for $i from 1 through 7 {
+    $color: list.nth($holo-sunpillar, ($i - 1 + $shift) % 6 + 1);
+    $stops: list.append($stops, $color ($space * $i), $separator: comma);
+  }
+  @return repeating-linear-gradient(0deg, $stops);
+}
+
+// Diagonal metallic sheen
+$holo-metal-bars: repeating-linear-gradient(
+  133deg,
+  #0e152e 0%,
+  hsl(180, 10%, 60%) 3.8%,
+  hsl(180, 29%, 66%) 4.5%,
+  hsl(180, 10%, 60%) 5.2%,
+  #0e152e 10%,
+  #0e152e 12%
+);
+
+// Light dark veil, thicker away from the pointer
+$holo-pointer-shade: radial-gradient(
+  farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+  hsla(0, 0%, 0%, 0.1) 12%,
+  hsla(0, 0%, 0%, 0.15) 20%,
+  hsla(0, 0%, 0%, 0.25) 120%
+);
+
+// Dark rainbow of the rainbow foils, repeated three times
+$holo-rainbow-dark: (
+  hsl(0, 57%, 37%),
+  hsl(40, 53%, 39%),
+  hsl(90, 60%, 35%),
+  hsl(180, 60%, 35%),
+  hsl(180, 60%, 35%),
+  hsl(210, 57%, 39%),
+  hsl(280, 55%, 31%)
+) !default;
+
+@function holo-rainbow-dark($angle) {
+  $c: $holo-rainbow-dark;
+  @return linear-gradient($angle, list.join(list.join(list.join($c, $c), $c), (list.nth($c, 1),)));
+}
+
+// Fine stepped grey bars: the cross-hatch of radiant foils
+@function holo-radiant-bars($angle, $width: 1.2%) {
+  $lightness: (10%, 20%, 35%, 42.5%, 50%, 42.5%, 35%, 20%, 10%, 0%);
+  $stops: ();
+  @for $k from 1 through 10 {
+    $color: hsl(0, 0%, list.nth($lightness, $k));
+    $start: 0%;
+    @if $k > 1 {
+      $start: $width * ($k - 1) + 0.01%;
+    }
+    $stops: list.append($stops, $color $start, $separator: comma);
+    $stops: list.append($stops, $color ($width * $k), $separator: comma);
+  }
+  @return repeating-linear-gradient($angle, $stops);
+}
+
+// =============================================================================
+//  REVERSE: everything shines but the illustration
+// =============================================================================
+k3-holo-card[effect='reverse'] {
+  &::part(shine) {
+    clip-path: var(--k3-holo-reverse-clip);
+    opacity: calc((1.5 * var(--k3-holo-opacity) - var(--k3-holo-pointer-from-center)) * var(--k3-holo-card-intensity, 1));
+    background-image:
+      radial-gradient(circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y), #fff 5%, #000 50%, #fff 80%),
+      linear-gradient(-45deg, #000 15%, #fff, #000 85%);
+    background-size: 120% 120%, 200% 200%;
+    background-position:
+      center,
+      calc(100% * var(--k3-holo-pointer-from-left)) calc(100% * var(--k3-holo-pointer-from-top));
+    background-blend-mode: soft-light;
+    filter: brightness(0.55) contrast(1.5);
+    mix-blend-mode: color-dodge;
+  }
+
+  &::part(glare) {
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(0, 0%, 100%, 0.8) 10%,
+      hsla(0, 0%, 100%, 0.5) 20%,
+      hsla(0, 0%, 0%, 0.75) 90%
+    );
+    filter: brightness(0.7) contrast(1.5);
+    mix-blend-mode: overlay;
+
+    // Sharp glare over the illustration
+    &::after {
+      content: '';
+      clip-path: var(--k3-holo-art-window);
+      opacity: var(--k3-holo-opacity);
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        #fff 10%,
+        hsla(0, 0%, 100%, 0.5) 20%,
+        hsla(0, 0%, 0%, 0.5) 120%
+      );
+      filter: contrast(1.5);
+    }
+  }
+}
+
+// =============================================================================
+//  RAINBOW: glittering rainbow and swirl pattern
+// =============================================================================
+k3-holo-card[effect='rainbow'] {
+  &::part(shine) {
+    background-image:
+      linear-gradient(-45deg, hsl(0, 57%, 37%), hsl(180, 60%, 35%)),
+      holo-img('glitter.png'),
+      holo-rainbow-dark(-30deg);
+    background-size: 200% 200%, 25% 25%, 400% 400%;
+    background-position:
+      calc(25% + 50% * var(--k3-holo-pointer-from-left)) calc(25% + 50% * var(--k3-holo-pointer-from-top)),
+      center,
+      calc(25% + var(--k3-holo-pointer-x) / 2) calc(25% + var(--k3-holo-pointer-y) / 2);
+    background-blend-mode: luminosity, soft-light;
+    filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.25 + 0.6)) contrast(2.2) saturate(0.75);
+    mix-blend-mode: color-dodge;
+
+    // Swirl pattern, stronger toward the edges
+    &::before {
+      content: '';
+      background-image: holo-img('illusion-mask.png');
+      background-size: 33%;
+      background-position: center;
+      filter: brightness(2.5);
+      opacity: calc((var(--k3-holo-pointer-from-center) + 0.4) * 0.6);
+      mix-blend-mode: darken;
+    }
+
+    &::after {
+      content: '';
+      background-image: holo-img('glitter.png'), holo-rainbow-dark(-60deg);
+      background-size: 25% 25%, 400% 400%;
+      background-position: center, var(--k3-holo-pointer-x) var(--k3-holo-pointer-y);
+      background-blend-mode: soft-light;
+      filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.3 + 0.55)) contrast(2);
+      mix-blend-mode: color-dodge;
+    }
+  }
+
+  &::part(glare) {
+    // The glare only appears away from the centre
+    opacity: calc(var(--k3-holo-pointer-from-center) * 0.9 * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsl(0, 0%, 80%),
+      hsla(187, 10%, 85%, 0.25) 30%,
+      hsl(197, 6%, 25%) 120%
+    );
+    filter: brightness(0.9) contrast(1.75);
+    mix-blend-mode: hard-light;
+  }
+}
+
+// =============================================================================
+//  RAINBOW ALT: glittering rainbow, no pattern
+// =============================================================================
+k3-holo-card[effect='rainbow-alt'] {
+  &::part(shine) {
+    background-image:
+      repeating-linear-gradient(
+        133deg,
+        hsla(283, 49%, 60%, 0.75) 5%,
+        hsla(2, 70%, 58%, 0.75) 10%,
+        hsla(53, 67%, 53%, 0.75) 15%,
+        hsla(93, 56%, 52%, 0.75) 20%,
+        hsla(176, 38%, 50%, 0.75) 25%,
+        hsla(228, 100%, 77%, 0.75) 30%,
+        hsla(283, 49%, 61%, 0.75) 35%
+      ),
+      holo-img('glitter.png'),
+      holo-rainbow-dark(-30deg);
+    background-size: 200% 400%, 25% 25%, 400% 400%;
+    background-position:
+      0% var(--k3-holo-background-y),
+      center,
+      calc(var(--k3-holo-background-x) * 1.5) calc(var(--k3-holo-background-y) * 1.5);
+    background-blend-mode: luminosity, overlay;
+    filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.3 + 0.3)) contrast(3) saturate(1.8);
+    mix-blend-mode: color-dodge;
+
+    &::after {
+      content: '';
+      opacity: calc(1.2 - var(--k3-holo-pointer-from-center) / 2);
+      background-image: holo-img('glitter.png'), holo-rainbow-dark(-60deg);
+      background-size: 25% 25%, 400% 400%;
+      background-position: center, calc(var(--k3-holo-background-x) * -1.5) calc(var(--k3-holo-background-y) * -1.5);
+      background-blend-mode: overlay;
+      filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.5 + 0.6)) contrast(3);
+      mix-blend-mode: color-dodge;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * 0.75 * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(50, 20%, 90%, 0.75) 0%,
+      hsla(150, 20%, 30%, 0.65) 45%,
+      #000 100%
+    );
+    filter: brightness(0.9) contrast(2);
+    mix-blend-mode: overlay;
+  }
+}
+
+// =============================================================================
+//  V: rainbow bands and metallic sheen over a fine grain
+// =============================================================================
+k3-holo-card[effect='v'] {
+  &::part(shine) {
+    background-image: holo-img('grain.webp'), holo-sunpillar-bands(), $holo-metal-bars, $holo-pointer-shade;
+    background-size: 500px 100%, 200% 700%, 300% 100%, 200% 100%;
+    background-position:
+      center,
+      0% var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y);
+    background-blend-mode: screen, hue, hard-light;
+    filter: brightness(0.7) contrast(2) saturate(0.5);
+    mix-blend-mode: color-dodge;
+
+    // Second pass running the other way
+    &::after {
+      content: '';
+      background-image: holo-img('grain.webp'), holo-sunpillar-bands(5), $holo-metal-bars, $holo-pointer-shade;
+      background-size: 500px 100%, 200% 400%, 195% 100%, 200% 100%;
+      background-position:
+        center,
+        0% var(--k3-holo-background-y),
+        calc(var(--k3-holo-background-x) * -1) calc(var(--k3-holo-background-y) * -1),
+        var(--k3-holo-background-x) var(--k3-holo-background-y);
+      background-blend-mode: screen, hue, hard-light;
+      filter: contrast(2.5) saturate(1.75);
+      mix-blend-mode: soft-light;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * 0.5 * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      #fff 0%,
+      hsla(210, 3%, 54%, 0.33) 45%,
+      hsla(0, 0%, 20%, 0.9) 130%
+    );
+    filter: brightness(0.9) contrast(1.75);
+    mix-blend-mode: hard-light;
+  }
+}
+
+// =============================================================================
+//  VMAX: sheen over ridged discs, brushed-metal look
+// =============================================================================
+k3-holo-card[effect='vmax'] {
+  &::part(shine) {
+    background-image:
+      holo-img('vmaxbg.jpg'),
+      repeating-linear-gradient(
+        -33deg,
+        hsl(2, 70%, 47%) 6%,
+        hsl(228, 60%, 64%) 12%,
+        hsl(176, 55%, 39%) 18%,
+        hsl(123, 68%, 35%) 24%,
+        hsl(283, 75%, 57%) 30%,
+        hsl(2, 70%, 47%) 36%
+      ),
+      repeating-linear-gradient(
+        133deg,
+        hsla(227, 53%, 12%, 0.5) 0%,
+        hsl(180, 10%, 50%) 2.5%,
+        hsl(83, 50%, 35%) 5%,
+        hsl(180, 10%, 50%) 7.5%,
+        hsla(227, 53%, 12%, 0.5) 10%,
+        hsla(227, 53%, 12%, 0.5) 15%
+      ),
+      radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsla(189, 76%, 77%, 0.6) 0%,
+        hsla(147, 59%, 77%, 0.6) 25%,
+        hsla(271, 55%, 69%, 0.6) 50%,
+        hsla(355, 56%, 72%, 0.6) 75%
+      );
+    background-size: 60% 30%, 1100% 1100%, 600% 600%, 200% 200%;
+    background-position:
+      center,
+      var(--k3-holo-background-x) var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y);
+    background-blend-mode: difference, luminosity, soft-light;
+    filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.4 + 0.4)) contrast(2);
+    mix-blend-mode: color-dodge;
+
+    &::after {
+      content: '';
+      opacity: calc(0.3 * var(--k3-holo-opacity) + var(--k3-holo-opacity) * var(--k3-holo-pointer-from-center) * 0.5);
+      background-image: holo-sunpillar-bands(5, 6%), $holo-metal-bars;
+      background-size: 200% 700%, 300% 100%;
+      background-position: 0% var(--k3-holo-background-y), var(--k3-holo-background-x) var(--k3-holo-background-y);
+      background-blend-mode: hue;
+      filter: saturate(1.5);
+      mix-blend-mode: lighten;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc((0.2 * var(--k3-holo-opacity) + var(--k3-holo-opacity) * var(--k3-holo-pointer-from-center) * 0.8) * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(0, 0%, 100%, 0.75) 0%,
+      #000 120%
+    );
+    mix-blend-mode: hard-light;
+  }
+}
+
+// =============================================================================
+//  VSTAR: engraved zigzag pattern
+// =============================================================================
+k3-holo-card[effect='vstar'] {
+  &::part(shine) {
+    background-image: holo-img('ancient.png'), holo-sunpillar-bands(), $holo-metal-bars, $holo-pointer-shade;
+    background-size: 18% 15%, 200% 700%, 300% 100%, 200% 100%;
+    background-position:
+      center,
+      0% var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y);
+    background-blend-mode: exclusion, hue, hard-light;
+    filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.25 + 0.35)) contrast(1.8) saturate(1.75);
+    mix-blend-mode: color-dodge;
+
+    &::before {
+      content: '';
+      z-index: 1; // above ::after
+      opacity: 0.8;
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        hsla(190, 7%, 80%, 0.75) 0%,
+        hsla(260, 7%, 50%, 0.25) 45%,
+        hsl(310, 7%, 50%) 120%
+      );
+      mix-blend-mode: hard-light;
+    }
+
+    &::after {
+      content: '';
+      background-image: holo-img('ancient.png'), holo-sunpillar-bands(5), $holo-metal-bars, $holo-pointer-shade;
+      background-size: 18% 15%, 200% 400%, 195% 100%, 200% 100%;
+      background-position:
+        center,
+        0% var(--k3-holo-background-y),
+        calc(var(--k3-holo-background-x) * -1) calc(var(--k3-holo-background-y) * -1),
+        var(--k3-holo-background-x) var(--k3-holo-background-y);
+      background-blend-mode: exclusion, hue, hard-light;
+      filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.75 + 0.5)) contrast(1.5) saturate(1.5);
+      mix-blend-mode: exclusion;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * var(--k3-holo-pointer-from-center) * 0.75 * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsl(195, 90%, 90%) 5%,
+      hsl(300, 3%, 60%) 60%,
+      hsl(350, 0%, 15%) 150%
+    );
+    filter: brightness(0.55) contrast(2);
+    mix-blend-mode: hard-light;
+  }
+}
+
+// =============================================================================
+//  Engraved pattern of vmax and vstar
+//  On dark artwork their texture barely shows and both foils look like v.
+//  This layer, painted over the card, brings out the vmax discs and the vstar
+//  zigzags around the pointer. --k3-holo-texture: 0 gives exactly
+//  the pokemon-cards-css look.
+// =============================================================================
+
+// The pattern lights up around the pointer, barely visible elsewhere
+$holo-texture-light: radial-gradient(
+  farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+  #000 0%,
+  rgba(0, 0, 0, 0.45) 35%,
+  rgba(0, 0, 0, 0.1) 80%
+);
+
+k3-holo-card[effect='vmax'],
+k3-holo-card[effect='vstar'] {
+ &::part(card)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: calc(var(--k3-holo-opacity) * var(--k3-holo-card-intensity, 1) * var(--k3-holo-texture));
+    background-blend-mode: multiply; // the gradient tints the pattern lines
+    mix-blend-mode: color-dodge;
+    -webkit-mask-image: $holo-texture-light;
+    mask-image: $holo-texture-light;
+  }
+}
+
+// vmax: ridged discs in rainbow colours
+k3-holo-card[effect='vmax']::part(card)::after {
+  background-image:
+    repeating-linear-gradient(
+      -33deg,
+      hsl(2, 80%, 65%) 6%,
+      hsl(228, 80%, 72%) 12%,
+      hsl(176, 70%, 60%) 18%,
+      hsl(123, 70%, 60%) 24%,
+      hsl(283, 80%, 72%) 30%,
+      hsl(2, 80%, 65%) 36%
+    ),
+    holo-img('vmaxbg.jpg');
+  background-size: 400% 400%, 60% 30%;
+  background-position: var(--k3-holo-background-x) var(--k3-holo-background-y), center;
+  filter: brightness(0.9) contrast(1.4);
+}
+
+// vstar: engraved zigzags tinted by the rainbow bands
+k3-holo-card[effect='vstar']::part(card)::after {
+  background-image: holo-sunpillar-bands(), holo-img('ancient.png');
+  background-size: 200% 700%, 18% 15%;
+  background-position: 0% var(--k3-holo-background-y), center;
+  filter: brightness(0.9) contrast(1.2);
+}
+
+// =============================================================================
+//  FULL ART and SHINY: swirl pattern over the whole card
+// =============================================================================
+k3-holo-card[effect='full-art'],
+k3-holo-card[effect='shiny'] {
+  &::part(shine) {
+    background-image: holo-img('illusion.png'), holo-sunpillar-bands(), $holo-metal-bars, $holo-pointer-shade;
+    background-size: 33%, 200% 700%, 300% 100%, 200% 100%;
+    background-position:
+      center,
+      0% var(--k3-holo-background-y),
+      calc(var(--k3-holo-background-x) + var(--k3-holo-background-y) * 0.2) var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y);
+    background-blend-mode: exclusion, hue, hard-light;
+    filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.3 + 0.35)) contrast(2) saturate(1.5);
+    mix-blend-mode: color-dodge;
+
+    &::after {
+      content: '';
+      background-image: holo-img('illusion.png'), holo-sunpillar-bands(5), $holo-metal-bars, $holo-pointer-shade;
+      background-size: 33%, 200% 400%, 195% 100%, 200% 100%;
+      background-position:
+        center,
+        0% var(--k3-holo-background-y),
+        calc((var(--k3-holo-background-x) + var(--k3-holo-background-y) * 0.2) * -1) calc(var(--k3-holo-background-y) * -1),
+        var(--k3-holo-background-x) var(--k3-holo-background-y);
+      background-blend-mode: exclusion, hue, hard-light;
+      filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.5 + 0.8)) contrast(1.6) saturate(1.4);
+      mix-blend-mode: exclusion;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * 0.75 * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsl(0, 0%, 75%) 5%,
+      hsl(200, 5%, 35%) 60%,
+      hsl(320, 40%, 10%) 150%
+    );
+    background-size: 120% 150%;
+    background-position: center;
+    filter: contrast(1.2);
+    mix-blend-mode: hard-light;
+  }
+}
+
+// Shiny: a more silvery take, with a white halo under the pointer
+k3-holo-card[effect='shiny'] {
+  &::part(shine) {
+    clip-path: var(--k3-holo-art-clip);
+
+    &::before {
+      content: '';
+      z-index: 1; // above ::after
+      opacity: 0.75;
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        #fff 0%,
+        hsla(0, 0%, 0%, 0) 40%
+      );
+      mix-blend-mode: overlay;
+    }
+
+    &::after {
+      filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.4 + 0.5)) contrast(1.4) saturate(1.2);
+      mix-blend-mode: difference;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * var(--k3-holo-pointer-from-center) * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      #fff 0%,
+      hsl(320, 5%, 15%) 150%
+    );
+    background-size: cover;
+    filter: brightness(1.2) saturate(0.7);
+    mix-blend-mode: multiply;
+  }
+}
+
+// =============================================================================
+//  RADIANT: cross-hatch, glitter and diagonal pastels
+// =============================================================================
+k3-holo-card[effect='radiant'] {
+  // The foil stays inside the card border
+  --k3-holo-border-clip: inset(2.8% 4% round 2.55% / 1.5%);
+
+  &::part(shine) {
+    clip-path: var(--k3-holo-border-clip);
+    background-image:
+      radial-gradient(
+        farthest-corner ellipse at calc(var(--k3-holo-pointer-x) * 0.5 + 25%) calc(var(--k3-holo-pointer-y) * 0.5 + 25%),
+        hsl(0, 0%, 95%) 20%,
+        hsl(175, 100%, 90%) 130%
+      ),
+      holo-radiant-bars(45deg),
+      holo-radiant-bars(-45deg);
+    background-size: cover, 210% 210%, 210% 210%;
+    background-position:
+      center,
+      calc((var(--k3-holo-background-x) - 50%) * 1.5 + 50%) calc((var(--k3-holo-background-y) - 50%) * 1.5 + 50%),
+      calc((var(--k3-holo-background-x) - 50%) * 1.5 + 50%) calc((var(--k3-holo-background-y) - 50%) * 1.5 + 50%);
+    background-blend-mode: exclusion, darken, color-dodge;
+    filter: brightness(0.5) contrast(2) saturate(1.75);
+    mix-blend-mode: color-dodge;
+
+    &::before {
+      content: '';
+      z-index: 1; // above ::after
+      background-image:
+        holo-img('glitter.png'),
+        radial-gradient(
+          farthest-corner ellipse at calc(var(--k3-holo-pointer-x) * 0.5 + 25%) calc(var(--k3-holo-pointer-y) * 0.5 + 25%),
+          hsla(0, 0%, 58%, 0.8) 10%,
+          hsla(0, 0%, 20%, 0.9) 20%,
+          hsla(0, 0%, 20%, 0.5) 50%
+        );
+      background-size: 15% 15%, 350% 350%;
+      background-position: center;
+      background-blend-mode: color-dodge;
+      filter: brightness(0.66) contrast(2) saturate(0.5);
+      mix-blend-mode: overlay;
+    }
+
+    &::after {
+      content: '';
+      clip-path: var(--k3-holo-art-clip);
+      background-image:
+        holo-img('trainerbg.png'),
+        repeating-linear-gradient(
+          55deg,
+          hsl(3, 95%, 85%) 200px,
+          hsl(207, 100%, 84%) 400px,
+          hsl(29, 100%, 85%) 600px,
+          hsl(160, 100%, 86%) 800px,
+          hsl(309, 94%, 87%) 1000px,
+          hsl(188, 95%, 85%) 1200px,
+          hsl(3, 95%, 85%) 1400px
+        );
+      background-size: 25% auto, 400% 100%;
+      background-position:
+        center,
+        calc((var(--k3-holo-background-x) - 50%) * -2.5 + 50%) calc((var(--k3-holo-background-y) - 50%) * -2.5 + 50%);
+      background-blend-mode: difference;
+      filter: brightness(0.6) contrast(3) saturate(2);
+      mix-blend-mode: color-dodge;
+    }
+  }
+
+  &::part(glare) {
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsla(0, 0%, 100%, 0.33) 0%,
+      hsl(0, 0%, 25%) 110%
+    );
+    filter: contrast(1.5);
+    mix-blend-mode: hard-light;
+  }
+}
+
+// =============================================================================
+//  FULL ART WAVE: subtle wavy lines
+// =============================================================================
+k3-holo-card[effect='full-art-wave'] {
+  &::part(shine) {
+    background-image: holo-img('trainerbg.png'), holo-sunpillar-bands(), $holo-metal-bars, $holo-pointer-shade;
+    background-size: 20%, 200% 700%, 300% 100%, 200% 100%;
+    background-position:
+      center,
+      0% var(--k3-holo-background-y),
+      calc(var(--k3-holo-background-x) + var(--k3-holo-background-y) * 0.2) var(--k3-holo-background-y),
+      var(--k3-holo-background-x) var(--k3-holo-background-y);
+    background-blend-mode: color-burn, hue, hard-light;
+    filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.05 + 0.6)) contrast(1.5) saturate(1.2);
+    mix-blend-mode: color-dodge;
+
+    &::before {
+      content: '';
+      z-index: 1; // above ::after
+      opacity: 0.5;
+      background-image: radial-gradient(
+        farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+        #fff 0%,
+        hsla(0, 0%, 0%, 0) 80%
+      );
+      mix-blend-mode: screen;
+    }
+
+    &::after {
+      content: '';
+      background-image: holo-img('trainerbg.png'), holo-sunpillar-bands(5), $holo-metal-bars, $holo-pointer-shade;
+      background-size: 20%, 200% 400%, 195% 100%, 200% 100%;
+      background-position:
+        center,
+        0% var(--k3-holo-background-y),
+        calc((var(--k3-holo-background-x) + var(--k3-holo-background-y) * 0.2) * -1) calc(var(--k3-holo-background-y) * -1),
+        var(--k3-holo-background-x) var(--k3-holo-background-y);
+      background-blend-mode: color-burn, hue, hard-light;
+      filter: brightness(calc(var(--k3-holo-pointer-from-center) * 0.05 + 0.6)) contrast(1.5) saturate(1.2);
+      mix-blend-mode: exclusion;
+    }
+  }
+
+  &::part(glare) {
+    opacity: calc(var(--k3-holo-opacity) * 0.75 * var(--k3-holo-card-intensity, 1));
+    background-image: radial-gradient(
+      farthest-corner circle at var(--k3-holo-pointer-x) var(--k3-holo-pointer-y),
+      hsl(0, 0%, 75%) 5%,
+      hsl(200, 5%, 35%) 60%,
+      hsl(320, 40%, 10%) 150%
+    );
+    background-size: 170% 170%;
+    background-position: center;
+    filter: brightness(1.5) contrast(1.4);
+    mix-blend-mode: multiply;
+  }
+}

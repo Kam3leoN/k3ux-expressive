@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>K3ux — animations</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 1.5rem;
+        background: #121212;
+        color: #eee;
+      }
+      h1 {
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      .grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      }
+      section {
+        border: 1px solid #333;
+        border-radius: 1rem;
+        padding: 1rem;
+        background: #1c1c1c;
+      }
+      section h2 {
+        margin: 0 0 0.75rem;
+        font-size: 1rem;
+      }
+      button {
+        margin-top: 0.75rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: 999px;
+        border: 0;
+        background: #6750a4;
+        color: #fff;
+        cursor: pointer;
+      }
+      k3-holo-card,
+      k3-lenticular-card,
+      k3-scratch-card {
+        width: 12rem;
+        display: block;
+      }
+      k3-holo-card img,
+      k3-lenticular-card img,
+      k3-scratch-card img {
+        width: 100%;
+        display: block;
+        border-radius: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>K3ux</h1>
+    <p>Companion UX / animations for <code>k3ui</code>.</p>
+    <div class="grid">
+      <section>
+        <h2>Text bounce</h2>
+        <k3-text-bounce id="bounce" text="HELLO" loop loop-delay="800"></k3-text-bounce>
+      </section>
+      <section>
+        <h2>Text scramble</h2>
+        <k3-text-scramble id="scramble" text="Material Expressive"></k3-text-scramble>
+        <button type="button" data-play="scramble">Play</button>
+      </section>
+      <section>
+        <h2>Heart burst</h2>
+        <k3-heart-burst continuous icon="heart" color="#ff4b4b">
+          <button type="button">Like</button>
+        </k3-heart-burst>
+      </section>
+      <section>
+        <h2>Confetti</h2>
+        <k3-confetti id="confetti"></k3-confetti>
+        <button type="button" data-fire="confetti">Fire</button>
+      </section>
+      <section>
+        <h2>Holo card</h2>
+        <k3-holo-card effect="prism">
+          <img
+            src="https://picsum.photos/seed/k3ux-holo/320/448"
+            alt="Demo artwork"
+            width="320"
+            height="448"
+          />
+        </k3-holo-card>
+      </section>
+      <section>
+        <h2>Lenticular</h2>
+        <k3-lenticular-card>
+          <img src="https://picsum.photos/seed/k3ux-a/320/448" alt="Face A" width="320" height="448" />
+          <img src="https://picsum.photos/seed/k3ux-b/320/448" alt="Face B" width="320" height="448" />
+        </k3-lenticular-card>
+      </section>
+      <section>
+        <h2>Scratch</h2>
+        <k3-scratch-card cover="gold" type="spray">
+          <img src="https://picsum.photos/seed/k3ux-prize/320/448" alt="Prize" width="320" height="448" />
+        </k3-scratch-card>
+      </section>
+      <section>
+        <h2>Halftone</h2>
+        <k3-halftone preset="poster" size="8">
+          <img src="https://picsum.photos/seed/k3ux-ht/480/320" alt="Halftone source" width="480" height="320" />
+        </k3-halftone>
+      </section>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
