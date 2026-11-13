@@ -38,6 +38,44 @@ describe('k3-audio-player', () => {
     expect(el.variant).toBe('card');
   });
 
+  it('card transport is Noph-style button-group (narrow / wide / narrow)', async () => {
+    const group = el.shadowRoot?.querySelector('k3-button-group.transport');
+    expect(group).toBeTruthy();
+    expect(group?.getAttribute('variant')).toBe('standard');
+    expect(group?.getAttribute('selection')).toBe('none');
+    const prev = group?.querySelector('k3-icon-button[part="prev"]');
+    const play = group?.querySelector('k3-icon-button[part="play"]');
+    const next = group?.querySelector('k3-icon-button[part="next"]');
+    expect(prev?.getAttribute('width')).toBe('narrow');
+    expect(prev?.getAttribute('variant')).toBe('tonal');
+    expect(prev?.getAttribute('size')).toBe('md');
+    expect(next?.getAttribute('width')).toBe('narrow');
+    expect(play?.getAttribute('width')).toBe('wide');
+    expect(play?.getAttribute('size')).toBe('md');
+    expect(play?.getAttribute('variant')).toBe('filled');
+    expect(play?.getAttribute('shape')).toBe('round');
+  });
+
+  it('compact matches play size on prev/next; phone steps up to lg', async () => {
+    el.variant = 'compact';
+    await el.updateComplete;
+    const compact = el.shadowRoot?.querySelector('k3-button-group.transport');
+    for (const part of ['prev', 'play', 'next'] as const) {
+      expect(compact?.querySelector(`k3-icon-button[part="${part}"]`)?.getAttribute('size')).toBe(
+        'md',
+      );
+    }
+
+    el.variant = 'phone';
+    await el.updateComplete;
+    const phone = el.shadowRoot?.querySelector('k3-button-group.transport');
+    for (const part of ['prev', 'play', 'next'] as const) {
+      expect(phone?.querySelector(`k3-icon-button[part="${part}"]`)?.getAttribute('size')).toBe(
+        'lg',
+      );
+    }
+  });
+
   it('renders title and artist as marquee lines (not ellipsis boxes)', async () => {
     el.tracks = [
       {

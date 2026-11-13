@@ -13,7 +13,9 @@
  *   - `full`    grand lecteur deux colonnes (file d'attente + paroles)
  * `expandable` + `expanded` : sheet dialog depuis **card** uniquement (pas toolbar).
  * `dock-toggle` : 2ᵉ clic sur sticky → toolbar (démo playground uniquement).
- * Sticky respecte `--k3-shell-rail-inline-size` (largeur rail compact/expanded).
+ * Sticky respecte `--k3-shell-rail-inline-size` (rail) et
+ * `--k3-floating-chrome-inset-inline-{start,end}` (FAB / extended / fab-menu / STT,
+ * les deux coins bas · LTR/RTL). Morph inset = spatial-fast (élastique en expressif).
  *
  * Réutilise K3ui : k3-icon-button · k3-button · k3-slider ·
  * k3-list / k3-list-item · k3-button-segmented · k3-loading-indicator ·
@@ -38,10 +40,12 @@ import {
   clearAxisTranslate,
   edgeScrollbarStyles,
   focusRingStyles,
+  observeFloatingChromeInset,
   prefersReducedMotion,
   shouldDismissDrag,
   stateLayerStyles,
   i18n,
+  type FloatingChromeInsetObserver,
   COLOR_ROLES,
   sysColorCssVars,
   MATERIAL_SHAPE_SVG,
@@ -855,20 +859,31 @@ const playerStyles = css`
     min-block-size: 42rem;
     margin-inline: auto;
   }
-  /* Sticky stays in remaining content — never over navigation-rail */
+  /*
+   * Sticky — content band only:
+   * start = rail + bottom-start FAB/STT · end = bottom-end FAB/STT.
+   * Inset morph uses spatial-fast (elastic when data-k3-motion=expressive).
+   */
   :host([variant='sticky']) {
     position: fixed;
     inset-inline-start: calc(
-      var(--k3-shell-rail-inline-size, 0px) + var(--k3-sys-spacing-space200, 1rem)
+      var(--k3-shell-rail-inline-size, 0px) + var(--k3-floating-chrome-inset-inline-start, 0px) +
+        var(--k3-sys-spacing-space200, 1rem)
     );
-    inset-inline-end: var(--k3-sys-spacing-space200, 1rem);
+    inset-inline-end: calc(
+      var(--k3-floating-chrome-inset-inline-end, 0px) + var(--k3-sys-spacing-space200, 1rem)
+    );
     inset-block-end: calc(var(--k3-nav-chrome-inset-block-end, 0px) + var(--k3-sys-spacing-space200, 1rem));
     inline-size: auto;
     z-index: 40;
     margin: 0;
     transition:
-      inset-inline-start var(--k3-sys-motion-duration-medium2, 300ms) var(--k3-sys-motion-easing-spatial, ease),
-      inset-block-end var(--k3-sys-motion-duration-medium2, 300ms) var(--k3-sys-motion-easing-spatial, ease),
+      inset-inline-start var(--k3-sys-motion-duration-spatial-fast, 350ms)
+        var(--k3-sys-motion-easing-spatial-fast, cubic-bezier(0.42, 1.67, 0.21, 0.9)),
+      inset-inline-end var(--k3-sys-motion-duration-spatial-fast, 350ms)
+        var(--k3-sys-motion-easing-spatial-fast, cubic-bezier(0.42, 1.67, 0.21, 0.9)),
+      inset-block-end var(--k3-sys-motion-duration-spatial-fast, 350ms)
+        var(--k3-sys-motion-easing-spatial-fast, cubic-bezier(0.42, 1.67, 0.21, 0.9)),
       opacity var(--_effects),
       visibility var(--_effects);
   }
@@ -1089,11 +1104,12 @@ const playerStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--k3-sys-spacing-space100);
     margin-inline: auto;
   }
-  .bar .transport {
-    gap: var(--k3-sys-spacing-space50);
+  /* k3-button-group owns gap; keep host centered in card/phone/full */
+  k3-button-group.transport {
+    width: auto;
+    max-width: 100%;
   }
   .transport .skip-sec-icon {
     display: block;
@@ -1861,9 +1877,6 @@ const playerStyles = css`
     justify-content: center;
     gap: var(--k3-sys-spacing-space200);
   }
-  .is-phone .transport {
-    gap: var(--k3-sys-spacing-space200);
-  }
   .is-phone .utility {
     flex: none;
     inline-size: 100%;
@@ -1959,13 +1972,16 @@ const playerStyles = css`
     pointer-events: none;
   }
 
-  /* Sticky dock — content band only (rail inset via --k3-shell-rail-inline-size) */
+  /* Sticky dock — rail + floating chrome both sides */
   :host([data-sticky-dock]) {
     position: fixed !important;
     inset-inline-start: calc(
-      var(--k3-shell-rail-inline-size, 0px) + var(--k3-sys-spacing-space200, 1rem)
+      var(--k3-shell-rail-inline-size, 0px) + var(--k3-floating-chrome-inset-inline-start, 0px) +
+        var(--k3-sys-spacing-space200, 1rem)
     ) !important;
-    inset-inline-end: var(--k3-sys-spacing-space200, 1rem) !important;
+    inset-inline-end: calc(
+      var(--k3-floating-chrome-inset-inline-end, 0px) + var(--k3-sys-spacing-space200, 1rem)
+    ) !important;
     inset-block-end: calc(
       var(--k3-nav-chrome-inset-block-end, 0px) + var(--k3-sys-spacing-space200, 1rem)
     ) !important;
@@ -1975,6 +1991,13 @@ const playerStyles = css`
     max-inline-size: none !important;
     margin: 0 !important;
     pointer-events: auto;
+    transition:
+      inset-inline-start var(--k3-sys-motion-duration-spatial-fast, 350ms)
+        var(--k3-sys-motion-easing-spatial-fast, cubic-bezier(0.42, 1.67, 0.21, 0.9)),
+      inset-inline-end var(--k3-sys-motion-duration-spatial-fast, 350ms)
+        var(--k3-sys-motion-easing-spatial-fast, cubic-bezier(0.42, 1.67, 0.21, 0.9)),
+      inset-block-end var(--k3-sys-motion-duration-spatial-fast, 350ms)
+        var(--k3-sys-motion-easing-spatial-fast, cubic-bezier(0.42, 1.67, 0.21, 0.9)) !important;
   }
 
   /* Expanded from card — dialog-like layer above shell chrome */
@@ -2172,6 +2195,8 @@ export class K3AudioPlayer extends K3Element {
   private onThemeChange = (): void => void this.applyDynamicColor();
   private onDocKey = (e: KeyboardEvent): void => this.handleHotkey(e);
   private portal = new LayerPortal();
+  /** Sticky dock — keep end inset clear of FAB / STT. */
+  private floatingChromeInset: FloatingChromeInsetObserver | null = null;
 
   get currentTrack(): AudioTrack | undefined {
     return this.tracks[this.trackIndex];
@@ -2277,6 +2302,8 @@ export class K3AudioPlayer extends K3Element {
     this.setScrollLock(false);
     this.removeAttribute('data-sheet-open');
     this.removeAttribute('data-sticky-dock');
+    this.floatingChromeInset?.disconnect();
+    this.floatingChromeInset = null;
     this.portal.clearHome();
     super.disconnectedCallback();
   }
@@ -3043,17 +3070,33 @@ export class K3AudioPlayer extends K3Element {
     if (sheet) {
       this.setAttribute('data-sheet-open', '');
       this.removeAttribute('data-sticky-dock');
+      this.stopFloatingChromeInset();
       this.portal.elevate(this);
       return;
     }
     this.removeAttribute('data-sheet-open');
     if (dock) {
       this.setAttribute('data-sticky-dock', '');
+      this.startFloatingChromeInset();
       this.portal.elevate(this);
       return;
     }
     this.removeAttribute('data-sticky-dock');
+    this.stopFloatingChromeInset();
     this.portal.restore(this);
+  }
+
+  private startFloatingChromeInset(): void {
+    if (this.floatingChromeInset) {
+      this.floatingChromeInset.sync();
+      return;
+    }
+    this.floatingChromeInset = observeFloatingChromeInset();
+  }
+
+  private stopFloatingChromeInset(): void {
+    this.floatingChromeInset?.disconnect();
+    this.floatingChromeInset = null;
   }
 
   /** Toolbar ↔ sticky (sticky→toolbar only when `dock-toggle`, demo). */
@@ -3575,30 +3618,38 @@ export class K3AudioPlayer extends K3Element {
         </div>`;
   }
 
-  /** Transport : k3-icon-button ; play rond → carré pendant la lecture. Skip ±N only on full. */
+  /**
+   * Transport — Noph homepage pattern:
+   * `k3-button-group` standard + `selection="none"` (keeps filled play),
+   * prev/next tonal narrow (vertical pills), play filled wide (horizontal),
+   * press = corner morph + neighbor width morph; playing = selected squircle.
+   * Skip ±N only on full.
+   */
   private renderTransport(kind: 'bar' | 'card' | 'compact' | 'full' | 'phone') {
     const cfg = {
-      bar: { side: 'sm', sideW: 'narrow', sideV: 'standard', play: 'sm', playW: 'default' },
-      compact: { side: 'sm', sideW: 'default', sideV: 'tonal', play: 'md', playW: 'default' },
-      card: { side: 'sm', sideW: 'default', sideV: 'tonal', play: 'md', playW: 'wide' },
-      full: { side: 'md', sideW: 'wide', sideV: 'tonal', play: 'lg', playW: 'wide' },
-      phone: { side: 'md', sideW: 'default', sideV: 'tonal', play: 'lg', playW: 'default' },
+      bar: { side: 'sm', sideW: 'narrow', sideV: 'tonal', play: 'sm', playW: 'wide' },
+      /* Same size on prev / play / next — play stays wide, sides narrow */
+      compact: { side: 'md', sideW: 'narrow', sideV: 'tonal', play: 'md', playW: 'wide' },
+      card: { side: 'md', sideW: 'narrow', sideV: 'tonal', play: 'md', playW: 'wide' },
+      full: { side: 'md', sideW: 'narrow', sideV: 'tonal', play: 'md', playW: 'wide' },
+      /* One step above card (md → lg) for all three */
+      phone: { side: 'lg', sideW: 'narrow', sideV: 'tonal', play: 'lg', playW: 'wide' },
     }[kind];
     const track = this.currentTrack;
     const playLabel = this.playing ? tr('pause', 'Pause', 'Pause') : tr('play', 'Play', 'Lecture');
-    /* Groupe non connecté (espacement M3 standard) : un k3-button-group mettrait les
-       boutons non sélectionnés en tonal, alors que Play doit rester « filled » au repos. */
     const prevLabel = tr('prev', 'Previous', 'Précédent');
     const nextLabel = tr('next', 'Next', 'Suivant');
     const backSec = kind === 'full' && this.skipBack > 0 ? Math.round(this.skipBack) : 0;
     const fwdSec = kind === 'full' && this.skipForward > 0 ? Math.round(this.skipForward) : 0;
     const backLabel = tr('skipBack', 'Back {n} seconds', 'Reculer de {n} s', { n: backSec });
     const fwdLabel = tr('skipForward', 'Forward {n} seconds', 'Avancer de {n} s', { n: fwdSec });
-    return html`<div
+    return html`<k3-button-group
       class="transport"
       part="transport"
-      role="group"
-      aria-label=${tr('transport', 'Playback controls', 'Contrôles de lecture')}
+      variant="standard"
+      selection="none"
+      shape="round"
+      label=${tr('transport', 'Playback controls', 'Contrôles de lecture')}
     >
       ${this.tip(
         prevLabel,
@@ -3608,6 +3659,7 @@ export class K3AudioPlayer extends K3Element {
           variant=${cfg.sideV}
           size=${cfg.side}
           width=${cfg.sideW}
+          shape="round"
           label=${prevLabel}
           ?disabled=${!this.tracks.length}
           @k3-click=${() => this.prev()}
@@ -3622,6 +3674,7 @@ export class K3AudioPlayer extends K3Element {
               variant=${cfg.sideV}
               size=${cfg.side}
               width=${cfg.sideW}
+              shape="round"
               label=${backLabel}
               ?disabled=${!track}
               @k3-click=${() => this.skipBy(-backSec)}
@@ -3656,6 +3709,7 @@ export class K3AudioPlayer extends K3Element {
               variant=${cfg.sideV}
               size=${cfg.side}
               width=${cfg.sideW}
+              shape="round"
               label=${fwdLabel}
               ?disabled=${!track}
               @k3-click=${() => this.skipBy(fwdSec)}
@@ -3670,13 +3724,14 @@ export class K3AudioPlayer extends K3Element {
           variant=${cfg.sideV}
           size=${cfg.side}
           width=${cfg.sideW}
+          shape="round"
           label=${nextLabel}
           ?disabled=${!this.tracks.length}
           @k3-click=${() => this.next()}
           >${icon('skip_next')}</k3-icon-button
         >`,
       )}
-    </div>`;
+    </k3-button-group>`;
   }
 
   private renderQueue() {
