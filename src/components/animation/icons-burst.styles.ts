@@ -1,6 +1,6 @@
 import { css } from 'lit';
 
-export const heartBurstStyles = css`
+export const iconsBurstStyles = css`
   :host {
     /* Hug the slotted target — beat playground stage width:100% stretch */
     display: inline-flex;
@@ -51,13 +51,13 @@ export const heartBurstStyles = css`
     position: absolute;
     left: 0;
     top: 0;
-    width: var(--k3-heart-burst-particle-size, 1.25rem);
-    height: var(--k3-heart-burst-particle-size, 1.25rem);
+    width: var(--k3-icons-burst-particle-size, 1.25rem);
+    height: var(--k3-icons-burst-particle-size, 1.25rem);
     margin: 0;
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--k3-heart-burst-color, #ff4b4b);
+    color: var(--k3-icons-burst-color, #ff4b4b);
     filter: drop-shadow(0 1px 3px color-mix(in srgb, currentColor 45%, transparent));
     will-change: transform, opacity;
     pointer-events: none;

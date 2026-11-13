@@ -1,7 +1,7 @@
 import { html, type PropertyValues } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { K3Element, prefersReducedMotion, i18n } from 'k3ui';
-import { hostReset } from '../_shared.js';
+import { hostReset } from '../../_shared.js';
 import { lenticularCardStyles } from './lenticular-card.styles.js';
 import { CardSpring, clamp, pointerRatio, watchDeviceTilt } from './card-motion.js';
 

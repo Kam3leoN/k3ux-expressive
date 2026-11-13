@@ -1,7 +1,7 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { K3Element, prefersReducedMotion, i18n } from 'k3ui';
-import { hostReset } from '../_shared.js';
+import { hostReset } from '../../_shared.js';
 import { scratchCardStyles } from './scratch-card.styles.js';
 import {
   defaultBrush,

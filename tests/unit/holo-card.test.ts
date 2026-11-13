@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '../../src/components/animation/holo-card.js';
-import type { K3HoloCard } from '../../src/components/animation/holo-card.js';
+import '../../src/components/animation/cards/holo-card.js';
+import type { K3HoloCard } from '../../src/components/animation/cards/holo-card.js';
 
 /** jsdom may lack PointerEvent — minimal polyfill for unit tests */
 class TestPointerEvent extends Event {

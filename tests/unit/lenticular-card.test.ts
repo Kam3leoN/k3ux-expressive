@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '../../src/components/animation/lenticular-card.js';
-import type { K3LenticularCard } from '../../src/components/animation/lenticular-card.js';
+import '../../src/components/animation/cards/lenticular-card.js';
+import type { K3LenticularCard } from '../../src/components/animation/cards/lenticular-card.js';
 
 class TestPointerEvent extends Event {
   pointerId: number;

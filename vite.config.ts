@@ -8,9 +8,11 @@ export default defineConfig({
     dts({
       include: ['src'],
       outDir: 'dist',
-      rollupTypes: true,
+      /* Ambient peer `k3ui` typings break api-extractor rollup. */
+      rollupTypes: false,
       entryRoot: 'src',
       insertTypesEntry: true,
+      exclude: ['types/**'],
     }),
   ],
   resolve: {
@@ -28,7 +30,15 @@ export default defineConfig({
     cssCodeSplit: false,
     assetsInlineLimit: 0,
     rollupOptions: {
-      external: ['k3ui', 'lit', 'lit/decorators.js', /^lit\//],
+      external: [
+        'k3ui',
+        'lit',
+        'lit/decorators.js',
+        /^lit\//,
+        'chart.js',
+        /^chart\.js\//,
+        '@material/material-color-utilities',
+      ],
       output: {
         inlineDynamicImports: true,
         assetFileNames: (assetInfo) => {

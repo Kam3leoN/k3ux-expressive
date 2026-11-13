@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { K3Element, prefersReducedMotion } from 'k3ui';
-import { hostReset } from '../_shared.js';
+import { hostReset } from '../../_shared.js';
 import { holoCardStyles } from './holo-card.styles.js';
 import { CardSpring, clamp, pointerRatio, watchDeviceTilt } from './card-motion.js';
 

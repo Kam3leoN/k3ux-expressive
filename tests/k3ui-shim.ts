@@ -1,8 +1,8 @@
 /**
- * Vitest / playground peer shim — only the k3ui surface k3ux components need.
- * Avoids loading the full k3ui catalog (and its CSS side-effects) during tests.
+ * Vitest peer surface — re-export k3ui public API with MANUAL boot
+ * so companion tests do not auto-register the full catalog.
  */
-export { K3Element, type Density } from '../../K3ui/src/core/k3-element.js';
-export { prefersReducedMotion } from '../../K3ui/src/core/lifecycle.js';
-export { easings } from '../../K3ui/src/motion/easings.js';
-export { i18n } from '../../K3ui/src/i18n/index.js';
+(globalThis as typeof globalThis & { window?: Window }).window ??= globalThis as unknown as Window;
+(window as Window & { K3UI_MANUAL?: boolean }).K3UI_MANUAL = true;
+
+export * from '../../K3ui/src/index.js';

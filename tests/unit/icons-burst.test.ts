@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '../../src/components/animation/heart-burst.js';
-import type { K3HeartBurst } from '../../src/components/animation/heart-burst.js';
+import '../../src/components/animation/icons-burst.js';
+import type { K3IconsBurst } from '../../src/components/animation/icons-burst.js';
 
-describe('k3-heart-burst', () => {
-  let el: K3HeartBurst;
+describe('k3-icons-burst', () => {
+  let el: K3IconsBurst;
 
   beforeEach(async () => {
-    el = document.createElement('k3-heart-burst') as K3HeartBurst;
+    el = document.createElement('k3-icons-burst') as K3IconsBurst;
     el.innerHTML = '<button type="button">Sponsor</button>';
     document.body.appendChild(el);
     await el.updateComplete;
@@ -17,7 +17,7 @@ describe('k3-heart-burst', () => {
   });
 
   it('registers and renders a particle layer', () => {
-    expect(customElements.get('k3-heart-burst')).toBeTruthy();
+    expect(customElements.get('k3-icons-burst')).toBeTruthy();
     expect(el.shadowRoot?.querySelector('.layer')).toBeTruthy();
   });
 

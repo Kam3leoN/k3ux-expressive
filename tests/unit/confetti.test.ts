@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '../../src/components/feedback/confetti.js';
-import type { K3Confetti } from '../../src/components/feedback/confetti.js';
+import '../../src/components/animation/confetti.js';
+import type { K3Confetti } from '../../src/components/animation/confetti.js';
 import {
   ConfettiCannon,
   ConfettiPresets,
   shapeFromPath,
-} from '../../src/components/feedback/confetti.js';
+} from '../../src/components/animation/confetti.js';
 
 describe('k3-confetti', () => {
   let el: K3Confetti;

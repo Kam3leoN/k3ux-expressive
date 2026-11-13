@@ -1,7 +1,7 @@
 {
   "name": "k3ux",
-  "version": "0.1.0",
-  "description": "K3ux — Material 3 Expressive UX animations (optional companion to k3ui)",
+  "version": "0.2.0",
+  "description": "K3ux — Material 3 Expressive UX companion (animations, media, charts) for k3ui",
   "author": "Kam3leoN",
   "license": "MIT AND GPL-3.0-only",
   "type": "module",
@@ -20,6 +20,7 @@
   },
   "files": [
     "dist",
+    "assets",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
@@ -58,6 +59,10 @@
   "peerDependencies": {
     "k3ui": ">=0.1.0",
     "lit": "^3.2.1"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "^0.4.0",
+    "chart.js": "^4.6.1"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

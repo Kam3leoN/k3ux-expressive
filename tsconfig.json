@@ -18,10 +18,11 @@
     "sourceMap": true,
     "rootDir": ".",
     "paths": {
-      "@k3ux/*": ["./src/*"]
+      "@k3ux/*": ["./src/*"],
+      "k3ui": ["./types/k3ui-peer.d.ts"]
     },
     "types": ["vitest/globals", "node"]
   },
-  "include": ["src", "tests/unit", "playground", "vite.config.ts", "vitest.config.ts"],
-  "exclude": ["dist", "node_modules", "tests/k3ui-shim.ts"]
+  "include": ["src", "tests/unit", "types", "vite.config.ts", "vitest.config.ts"],
+  "exclude": ["dist", "node_modules", "tests/k3ui-shim.ts", "playground"]
 }

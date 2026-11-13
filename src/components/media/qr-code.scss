@@ -1,0 +1,138 @@
+// k3-qr-code — shadow DOM styles.
+// Compiled at build time through Vite `?inline` (see qr-code.styles.ts),
+// so tokens stay CSS custom properties and themes apply at runtime.
+@use 'sass:map';
+
+/// Display widths — convention A (XS 96 · SM 128 · MD 192 · LG 256 · XL 320 dp)
+$sizes: (
+  xs: 6rem,
+  sm: 8rem,
+  md: 12rem,
+  lg: 16rem,
+  xl: 20rem,
+);
+
+$icon-font: var(
+  --k3-sys-icon-font-family,
+  'Material Symbols Rounded',
+  'Material Symbols Outlined',
+  sans-serif
+);
+
+:host {
+  --_size: var(--k3-qr-code-size, #{map.get($sizes, md)});
+  --_radius: var(--k3-qr-code-state-radius, var(--k3-sys-shape-corner-large, 1rem));
+
+  display: inline-block;
+  inline-size: var(--_size);
+  max-inline-size: 100%;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+@each $name, $width in $sizes {
+  :host([size='#{$name}']) {
+    --_size: var(--k3-qr-code-size, #{$width});
+  }
+}
+
+/* Fill the container width (generator preview, cards…) */
+:host([fluid]) {
+  display: block;
+  inline-size: 100%;
+}
+
+.code {
+  display: block;
+  inline-size: 100%;
+  /* Scanners need the authored colours — never let High Contrast repaint them */
+  forced-color-adjust: none;
+
+  svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+}
+
+.code--enter {
+  animation: k3-qr-enter var(--k3-sys-motion-duration-medium2, 300ms)
+    var(--k3-sys-motion-easing-expressive-spatial, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+@keyframes k3-qr-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* Empty + error states keep the square footprint so layouts never jump */
+.state {
+  box-sizing: border-box;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--k3-sys-spacing-space100, 0.5rem);
+  aspect-ratio: 1;
+  inline-size: 100%;
+  padding: var(--k3-sys-spacing-space200, 1rem);
+  border-radius: var(--_radius);
+  line-height: normal;
+  text-align: center;
+  font-family: var(--k3-ref-typeface-plain, inherit);
+  font-size: var(--k3-sys-typescale-body-medium-size, 0.875rem);
+  line-height: var(--k3-sys-typescale-body-medium-line-height, 1.25rem);
+  letter-spacing: var(--k3-sys-typescale-body-medium-tracking, 0.0156rem);
+}
+
+.state--empty {
+  color: var(--k3-sys-color-on-surface-variant);
+  background: var(--k3-sys-color-surface-container);
+  outline: 2px dashed var(--k3-sys-color-outline-variant);
+  outline-offset: -2px;
+}
+
+.state--error {
+  color: var(--k3-sys-color-on-error-container);
+  background: var(--k3-sys-color-error-container);
+}
+
+.state-icon {
+  font-family: $icon-font;
+  font-size: var(--k3-sys-icon-size-large, 2.5rem);
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 40;
+}
+
+.state-text {
+  max-inline-size: 16ch;
+  text-wrap: balance;
+}
+
+/* Too small for a sentence — icon only, label stays for assistive tech */
+:host([size='xs']) .state-text,
+:host([size='sm']) .state-text {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code--enter {
+    animation: none;
+  }
+}
+
+:host-context([data-k3-reduce-motion]) .code--enter {
+  animation: none;
+}

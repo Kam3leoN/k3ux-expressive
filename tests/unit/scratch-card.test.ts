@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '../../src/components/animation/scratch-card.js';
-import type { K3ScratchCard } from '../../src/components/animation/scratch-card.js';
-import { measureCleared } from '../../src/components/animation/scratch-card.engine.js';
+import '../../src/components/animation/cards/scratch-card.js';
+import type { K3ScratchCard } from '../../src/components/animation/cards/scratch-card.js';
+import { measureCleared } from '../../src/components/animation/cards/scratch-card.engine.js';
 
 class TestPointerEvent extends Event {
   pointerId: number;

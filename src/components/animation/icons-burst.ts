@@ -2,11 +2,11 @@ import { html } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { K3Element, prefersReducedMotion, easings } from 'k3ui';
 import { hostReset } from '../_shared.js';
-import { heartBurstStyles } from './heart-burst.styles.js';
+import { iconsBurstStyles } from './icons-burst.styles.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-export const HeartBurstSpecs = {
+export const IconsBurstSpecs = {
   count: 10,
   durationMin: 900,
   durationMax: 1600,
@@ -37,26 +37,26 @@ const ICON_PATHS = {
   like: 'M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z',
 } as const;
 
-export type HeartBurstTrigger = 'hover' | 'click' | 'both';
-export type HeartBurstIcon = keyof typeof ICON_PATHS;
+export type IconsBurstTrigger = 'hover' | 'click' | 'both';
+export type IconsBurstIcon = keyof typeof ICON_PATHS;
 
 /**
  * Pointer-following particles over any slotted surface (button, card, text…).
  * Hit-testing is only on the slotted target’s border box. Use `clip` to keep
  * particle motion inside the target. Without `clip`, particles may rise above.
  */
-export class K3HeartBurst extends K3Element {
-  static override styles = [hostReset, heartBurstStyles];
+export class K3IconsBurst extends K3Element {
+  static override styles = [hostReset, iconsBurstStyles];
 
-  @property({ reflect: true }) trigger: HeartBurstTrigger = 'hover';
-  @property({ type: Number }) count: number = HeartBurstSpecs.count;
+  @property({ reflect: true }) trigger: IconsBurstTrigger = 'hover';
+  @property({ type: Number }) count: number = IconsBurstSpecs.count;
   @property({ type: Boolean, attribute: 'continuous' }) continuous = true;
   /** Block layout for cards / full-width targets. */
   @property({ type: Boolean, reflect: true }) block = false;
   /** Keep particle flight inside the target (soft fade, no hard mid-glyph cut). */
   @property({ type: Boolean, reflect: true }) clip = false;
   /** Particle glyph. */
-  @property({ reflect: true }) icon: HeartBurstIcon = 'heart';
+  @property({ reflect: true }) icon: IconsBurstIcon = 'heart';
   @property() color = '';
 
   @query('.layer') private layer?: HTMLElement;
@@ -165,7 +165,7 @@ export class K3HeartBurst extends K3Element {
     const target = this.firstSlotted();
     const hostRect = this.getBoundingClientRect();
     if (!target || hostRect.width <= 0) {
-      const pad = this.clip ? 0 : HeartBurstSpecs.layerPadTop;
+      const pad = this.clip ? 0 : IconsBurstSpecs.layerPadTop;
       layer.style.left = '0';
       layer.style.top = `${-pad}px`;
       layer.style.width = '100%';
@@ -179,7 +179,7 @@ export class K3HeartBurst extends K3Element {
     const t = target.getBoundingClientRect();
     const left = t.left - hostRect.left + this.scrollLeft;
     const top = t.top - hostRect.top + this.scrollTop;
-    const pad = this.clip ? 0 : HeartBurstSpecs.layerPadTop;
+    const pad = this.clip ? 0 : IconsBurstSpecs.layerPadTop;
 
     layer.style.left = `${left}px`;
     layer.style.top = `${top - pad}px`;
@@ -200,7 +200,7 @@ export class K3HeartBurst extends K3Element {
     if (!layer) return;
     this.layoutLayer();
     const rect = layer.getBoundingClientRect();
-    const inset = this.clip ? HeartBurstSpecs.particleInset : 0;
+    const inset = this.clip ? IconsBurstSpecs.particleInset : 0;
     const xMin = inset;
     const xMax = Math.max(xMin, this.layerW - inset);
     const yMin = this.layerOriginY + inset;
@@ -212,7 +212,7 @@ export class K3HeartBurst extends K3Element {
 
   private ensurePointerFallback(): void {
     if (this.hasPointer) return;
-    const inset = this.clip ? HeartBurstSpecs.particleInset : 0;
+    const inset = this.clip ? IconsBurstSpecs.particleInset : 0;
     this.pointerX = this.layerW / 2;
     this.pointerY =
       this.layerOriginY +
@@ -253,10 +253,10 @@ export class K3HeartBurst extends K3Element {
     this.syncPointer(e);
     const dx = this.pointerX - this.lastMoveX;
     const dy = this.pointerY - this.lastMoveY;
-    if (dx * dx + dy * dy < HeartBurstSpecs.moveThreshold ** 2) return;
+    if (dx * dx + dy * dy < IconsBurstSpecs.moveThreshold ** 2) return;
     this.lastMoveX = this.pointerX;
     this.lastMoveY = this.pointerY;
-    this.burst(HeartBurstSpecs.moveCount);
+    this.burst(IconsBurstSpecs.moveCount);
   };
 
   private readonly onDown = (e: PointerEvent): void => {
@@ -274,7 +274,7 @@ export class K3HeartBurst extends K3Element {
         return;
       }
       this.burst(Math.max(1, Math.ceil(this.count / 4)));
-    }, HeartBurstSpecs.pulseMs);
+    }, IconsBurstSpecs.pulseMs);
   }
 
   private stopPulse(): void {
@@ -299,8 +299,8 @@ export class K3HeartBurst extends K3Element {
     svgEl.append(pathEl);
     particle.append(svgEl);
 
-    const j = HeartBurstSpecs.jitter;
-    const inset = this.clip ? HeartBurstSpecs.particleInset : 0;
+    const j = IconsBurstSpecs.jitter;
+    const inset = this.clip ? IconsBurstSpecs.particleInset : 0;
     const xMin = inset;
     const xMax = Math.max(xMin, this.layerW - inset);
     const yMin = this.layerOriginY + inset;
@@ -311,9 +311,9 @@ export class K3HeartBurst extends K3Element {
     startX = this.clamp(startX, xMin, xMax);
     startY = this.clamp(startY, yMin, yMax);
 
-    const riseMin = this.clip ? HeartBurstSpecs.riseMinClipped : HeartBurstSpecs.riseMin;
-    const riseMax = this.clip ? HeartBurstSpecs.riseMaxClipped : HeartBurstSpecs.riseMax;
-    const driftMax = this.clip ? HeartBurstSpecs.driftClipped : HeartBurstSpecs.drift;
+    const riseMin = this.clip ? IconsBurstSpecs.riseMinClipped : IconsBurstSpecs.riseMin;
+    const riseMax = this.clip ? IconsBurstSpecs.riseMaxClipped : IconsBurstSpecs.riseMax;
+    const driftMax = this.clip ? IconsBurstSpecs.driftClipped : IconsBurstSpecs.drift;
     let rise = riseMin + Math.random() * (riseMax - riseMin);
     let drift = (Math.random() - 0.5) * 2 * driftMax;
 
@@ -326,15 +326,15 @@ export class K3HeartBurst extends K3Element {
     }
 
     const scale =
-      HeartBurstSpecs.scaleMin +
-      Math.random() * (HeartBurstSpecs.scaleMax - HeartBurstSpecs.scaleMin);
+      IconsBurstSpecs.scaleMin +
+      Math.random() * (IconsBurstSpecs.scaleMax - IconsBurstSpecs.scaleMin);
     const duration =
-      HeartBurstSpecs.durationMin +
-      Math.random() * (HeartBurstSpecs.durationMax - HeartBurstSpecs.durationMin);
+      IconsBurstSpecs.durationMin +
+      Math.random() * (IconsBurstSpecs.durationMax - IconsBurstSpecs.durationMin);
 
     particle.style.left = `${startX}px`;
     particle.style.top = `${startY}px`;
-    /* Size comes from --k3-heart-burst-particle-size; scale only varies slightly */
+    /* Size comes from --k3-icons-burst-particle-size; scale only varies slightly */
     particle.style.transform = 'translate(-50%, -50%)';
     layer.appendChild(particle);
 
@@ -389,14 +389,14 @@ export class K3HeartBurst extends K3Element {
   };
 }
 
-export default K3HeartBurst;
+export default K3IconsBurst;
 
-if (!customElements.get('k3-heart-burst')) {
-  customElements.define('k3-heart-burst', K3HeartBurst);
+if (!customElements.get('k3-icons-burst')) {
+  customElements.define('k3-icons-burst', K3IconsBurst);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'k3-heart-burst': K3HeartBurst;
+    'k3-icons-burst': K3IconsBurst;
   }
 }

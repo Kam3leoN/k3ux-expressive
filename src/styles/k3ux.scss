@@ -1,6 +1,27 @@
-/* k3ux — decorative animation package.
+/* k3ux — UX companion stylesheet.
  * Colour / type / motion tokens come from the peer `k3ui` stylesheet.
- * This file is intentionally minimal so the UX add-on stays light. */
+ * FOUC placeholders keep layout stable until custom elements upgrade. */
 :root {
   --k3ux-version: 0.1.0;
+}
+
+/*
+ * Components upgraded after the first paint keep their space meanwhile —
+ * no layout jump. k3-chart reads --k3-chart-height (or its height attribute,
+ * where the browser can read it from CSS).
+ */
+k3-chart:not(:defined) {
+  display: block;
+  block-size: var(--k3-chart-height, 17.5rem);
+  block-size: attr(height px, var(--k3-chart-height, 17.5rem));
+}
+
+/*
+ * Modal sheet/dialog open — sticky audio (FABs use perimeter show/hide).
+ * Toggled by sheet-chrome-shift (`data-k3-sheet-chrome-hidden` on <html>).
+ */
+html[data-k3-sheet-chrome-hidden] k3-audio-player[variant='sticky'] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
