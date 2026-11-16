@@ -10,6 +10,7 @@ export const catalog: ComponentDef[] = [
   { tag: 'k3-confetti', load: () => import('../components/animation/confetti.js') },
   { tag: 'k3-snow', load: () => import('../components/animation/snow.js') },
   { tag: 'k3-firework', load: () => import('../components/animation/firework.js') },
+  { tag: 'k3-sparkle-mouse', load: () => import('../components/animation/sparkle-mouse.js') },
   { tag: 'k3-voice-ring', load: () => import('../components/animation/voice-ring.js') },
   { tag: 'k3-text-bounce', load: () => import('../components/animation/text-bounce.js') },
   { tag: 'k3-text-scramble', load: () => import('../components/animation/text-scramble.js') },

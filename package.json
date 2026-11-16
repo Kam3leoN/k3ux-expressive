@@ -15,6 +15,11 @@
       "import": "./dist/k3ux.js",
       "default": "./dist/k3ux.js"
     },
+    "./lazy": {
+      "import": "./dist/lazy/k3ux.js",
+      "default": "./dist/lazy/k3ux.js"
+    },
+    "./components.json": "./dist/lazy/components.json",
     "./k3ux.css": "./dist/k3ux.css",
     "./holo-effects.css": "./dist/holo-effects/k3ux-holo-effects.css"
   },
@@ -27,8 +32,10 @@
   ],
   "scripts": {
     "dev": "vite --config playground/vite.config.ts",
-    "build": "npm run build:lib && npm run build:holo-effects",
+    "build": "npm run build:lib && npm run build:lazy && npm run build:holo-effects",
     "build:lib": "vite build",
+    "build:lazy": "vite build --config vite.lazy.config.ts",
+    "build:pack": "node scripts/build-pack.mjs",
     "build:holo-effects": "node scripts/build-holo-effects.mjs",
     "build:playground": "vite build --config playground/vite.config.ts",
     "test": "vitest run",

@@ -7,8 +7,8 @@ export default defineConfig({
     alias: {
       '@k3ux': resolve(__dirname, '../src'),
       /* Dev: peer from sibling package source + CSS entry. */
-      k3ui: resolve(__dirname, '../../K3ui/src/index.ts'),
       'k3ui/k3ui.css': resolve(__dirname, '../../K3ui/src/styles/k3ui.scss'),
+      k3ui: resolve(__dirname, '../../K3ui/src/index.ts'),
       lit: resolve(__dirname, '../node_modules/lit'),
     },
   },

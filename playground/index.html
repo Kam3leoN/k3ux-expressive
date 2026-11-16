@@ -112,6 +112,20 @@
           <img src="https://picsum.photos/seed/k3ux-ht/480/320" alt="Halftone source" width="480" height="320" />
         </k3-halftone>
       </section>
+      <section>
+        <h2>Sparkle mouse</h2>
+        <p>Move the pointer anywhere on the page.</p>
+        <k3-sparkle-mouse id="sparkle"></k3-sparkle-mouse>
+        <label>
+          Intensity <output id="sparkle-intensity-out">20</output> %
+          <input id="sparkle-intensity" type="range" min="0" max="100" value="20" />
+        </label>
+        <label>
+          Colors (comma list — roles, CSS colours, var())
+          <input id="sparkle-colors" type="text" size="36" placeholder="#5b8def, #6f7bf7, #7c5cff, #9a6bff, #b388ff" />
+        </label>
+        <button type="button" data-sparkle="burst">Burst</button>
+      </section>
     </div>
     <script type="module" src="./main.ts"></script>
   </body>

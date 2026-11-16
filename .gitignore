@@ -1,5 +1,6 @@
 node_modules/
 dist/
 dist-playground/
+.temp/
 *.log
 .DS_Store

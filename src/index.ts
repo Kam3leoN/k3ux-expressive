@@ -30,6 +30,15 @@ export {
   type SnowEngineOptions,
 } from './components/animation/snow.js';
 export {
+  K3SparkleMouse,
+  SparkleEngine,
+  SparkleMouseSpecs,
+  intensityFactor,
+  parseSparkleColors,
+  resolveSparkleColors,
+  type SparkleEngineOptions,
+} from './components/animation/sparkle-mouse.js';
+export {
   K3Firework,
   FireworksEngine,
   FireworkSpecs,

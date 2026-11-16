@@ -1,8 +1,14 @@
 import { catalog } from './catalog.js';
+import { COMPONENT_DEPS } from './deps.js';
+import { inPack, packInfo } from './missing.js';
 
 const registered = new Set<string>();
 
-export async function register(tag: string): Promise<void> {
+export async function register(tag: string, seen: Set<string> = new Set()): Promise<void> {
+  if (seen.has(tag)) return;
+  seen.add(tag);
+  const deps = COMPONENT_DEPS[tag];
+  if (deps?.length) await Promise.all(deps.map((dep) => register(dep, seen)));
   if (registered.has(tag) || customElements.get(tag)) {
     registered.add(tag);
     return;
@@ -12,8 +18,18 @@ export async function register(tag: string): Promise<void> {
     console.warn(`[k3ux/registry] unknown tag: ${tag}`);
     return;
   }
+  if (!inPack(tag)) {
+    console.error(
+      `[k3ux] <${tag}> is not in this pack. Rebuild: ${packInfo()?.builder ?? 'pack.html?product=k3ux'}`,
+    );
+    return;
+  }
   const mod = await def.load();
   const ctor = mod.default;
+  if (!ctor) {
+    console.error(`[k3ux] <${tag}> is not in this pack (stub loader).`);
+    return;
+  }
   if (!customElements.get(tag)) {
     customElements.define(tag, ctor);
   }
@@ -21,7 +37,7 @@ export async function register(tag: string): Promise<void> {
 }
 
 export async function registerAll(tags: 'all' | string[] = 'all'): Promise<void> {
-  const list = tags === 'all' ? catalog.map((c) => c.tag) : tags;
+  const list = tags === 'all' ? catalog.map((c) => c.tag).filter(isKnown) : tags;
   await Promise.all(list.map((t) => register(t)));
 }
 
@@ -30,7 +46,7 @@ export function isRegistered(tag: string): boolean {
 }
 
 export function isKnown(tag: string): boolean {
-  return catalog.some((c) => c.tag === tag);
+  return catalog.some((c) => c.tag === tag) && inPack(tag);
 }
 
 export const registry = {
